@@ -1,5 +1,7 @@
 # babel-jest-glob-transform
 
+Compatible with [webpack-glob-loader](https://github.com/danh20051995/webpack-glob-loader)
+
 ## Usage
 
 ---
