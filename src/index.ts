@@ -10,11 +10,7 @@ import * as babelJest from 'babel-jest'
 import { TransformOptions } from '@babel/core'
 import type { Transformer } from '@jest/transform'
 
-interface BabelJestTransformer extends Transformer {
-  canInstrument: true;
-}
-
-export const createTransformer = (options?: TransformOptions) => {
+const createTransformer = (options?: TransformOptions) => {
   const transformer = babelJest.createTransformer(options)
 
   const process = transformer.process
@@ -67,3 +63,10 @@ export const createTransformer = (options?: TransformOptions) => {
 
   return transformer
 }
+
+const transformer: Transformer = {
+  ...createTransformer(),
+  createTransformer
+}
+
+export = transformer
