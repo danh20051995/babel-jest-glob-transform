@@ -1,0 +1,68 @@
+"use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from) {
+    for (var i = 0, il = from.length, j = to.length; i < il; i++, j++)
+        to[j] = from[i];
+    return to;
+};
+/**
+ * File name: src/index.ts
+ * Created by Visual studio code
+ * User: Danh Le / danh.danh20051995@gmail.com
+ * Date: 2021-03-10 17:07:50
+ */
+var path = require("path");
+var glob = require("glob");
+var babelJest = require("babel-jest");
+var createTransformer = function (options) {
+    var transformer = babelJest.createTransformer(options);
+    var process = transformer.process;
+    transformer.process = function (sourceText, sourcePath) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        var regexp = /^\s*import\s+(?:[^"'`{}]+\s)?(["'])(.+)\1/gm;
+        var patterns = [];
+        var match = regexp.exec(sourceText);
+        while (match !== null) {
+            var fileImport = match[2];
+            var lineReplace = match[0];
+            if (glob.hasMagic(fileImport)) {
+                patterns.push({
+                    fileImport: fileImport,
+                    lineReplace: lineReplace
+                });
+            }
+            match = regexp.exec(sourceText);
+        }
+        if (patterns.length > 0) {
+            var cwd = path.dirname(sourcePath);
+            var importNameRegex = /import ([a-zA-Z0-9]{1,}) from /;
+            var _loop_1 = function (fileImport, lineReplace) {
+                var modNames = [];
+                var matchModuleName = importNameRegex.exec(lineReplace);
+                var files = glob
+                    .sync(fileImport, { cwd: cwd, dot: true })
+                    .map(function (mod, index) {
+                    if (!matchModuleName) {
+                        return "import '" + mod + "'";
+                    }
+                    var moduleName = "" + matchModuleName[1] + index;
+                    modNames.push(moduleName);
+                    return "import * as " + moduleName + " from '" + mod + "'";
+                });
+                if (modNames.length) {
+                    files.push("const " + matchModuleName[1] + " = [ " + modNames.join(', ') + " ]");
+                }
+                sourceText = sourceText.replace(lineReplace, files.join('\n'));
+            };
+            for (var _a = 0, patterns_1 = patterns; _a < patterns_1.length; _a++) {
+                var _b = patterns_1[_a], fileImport = _b.fileImport, lineReplace = _b.lineReplace;
+                _loop_1(fileImport, lineReplace);
+            }
+        }
+        return process.apply(void 0, __spreadArray([sourceText, sourcePath], args));
+    };
+    return transformer;
+};
+module.exports = createTransformer;
