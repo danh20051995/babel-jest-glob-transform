@@ -2,10 +2,17 @@
   "name": "babel-jest-glob-transform",
   "version": "1.0.0",
   "description": "jest transformer to work with webpack-glob-loader",
-  "author": "danh.danh20051995@gmail.com",
-  "license": "ISC",
+  "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "author": {
+    "name": "Danh Le",
+    "url": "https://github.com/danh20051995"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danh20051995/babel-jest-glob-transform"
+  },
   "keywords": [
     "jest",
     "babel-jest",
